@@ -23,17 +23,7 @@ async function routes (fastify, options) {
       return { hello: 'world en capsule pour le test' }
     })
 
-    fastify.get('/api/testShell', async (request, reply) => {
-        const executor = new CommandExecutor();
-        executor.runCommand('ls -la') // Exemple de commande UNIX pour lister les fichiers
-            .then(output => {
-                console.log('Command Output:', output);
-                return { hello: 'test' }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-      })
+
 
       fastify.get('/api/importPostGres', async (request, reply) => {
         const executor = new CommandExecutor();
@@ -47,13 +37,12 @@ async function routes (fastify, options) {
             });
       })
 
-    fastify.post('/api/downloadDb', async (request, reply) => {
-        const { name, path } = request.body;
-        return { name, path };
-      });
 
 
       // route post pour ajouter une base de donnée à la liste des bases de données
+      fastify.post('/api/createDb', async (request, reply) => {
+      });
+
 
       //route pour faire un save d'une bdd enregistrée
 

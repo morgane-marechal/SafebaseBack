@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  postgres_database_version:
+    image: 'postgres'
+    environment:
+      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: safebase
+      POSTGRES_DB: safebase
+    ports:
+      - '5434:5432' # Le port interne 5432 est mappé au port externe 5434
+
+  postgres_database_prod:
+    image: 'postgres'
+    environment:
+      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: dev
+      POSTGRES_DB: dev
+    ports:
+      - '5433:5432' # Le port interne 5432 est mappé au port externe 5433
+
+  mysql_database:
+    image: 'mysql:8.0'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: prod
+      MYSQL_USER: prod
+      MYSQL_PASSWORD: pass
+    ports:
+      - '3307:3306'
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - '9080:8080'

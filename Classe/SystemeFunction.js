@@ -33,9 +33,9 @@ class CommandExecutor {
     }
 
     async importPostGres() {
-        const CONTAINER_NAME = "safebaseback-postgres_database_prod-1";
+        const CONTAINER_NAME = "safebaseback-postgres_database_dev-1";
         const TIMESTAMP = this.getFormattedTimestamp();
-        const command = `docker exec -t ${CONTAINER_NAME} pg_dump -U dev dev > "/home/morgane/projets/SafebaseBack/Sauvegardes/SauvegardesPosteGres/savebase_postgres_${TIMESTAMP}.sql"`;
+        const command = `docker exec -t ${CONTAINER_NAME} pg_dump --clean -U dev dev > "/home/morgane/projets/SafebaseBack/Sauvegardes/SauvegardesPosteGres/savebase_postgres_${TIMESTAMP}.sql"`;
         try {
             const output = await this.runCommand(command);
             console.log(`Backup successful: ${output}`);

@@ -1,11 +1,9 @@
-const firstRoute = require('./routes');
-
-
+const apiRoutes = require('./routes');
 const fastify = require('fastify')({
     logger: true
   })
 
-fastify.register(firstRoute)
+fastify.register(apiRoutes)
 
 
 fastify.listen({ port: 3000 }, function (err, address) {

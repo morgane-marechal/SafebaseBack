@@ -2,7 +2,6 @@ const { exec } = require('child_process');
 
 class CommandExecutor {
     constructor() {
-        // Vous pouvez initialiser des propriétés ici si nécessaire
     }
 
     runCommand(command) {
@@ -24,11 +23,11 @@ class CommandExecutor {
 
     getFormattedTimestamp() {
         const date = new Date();
-        const year = date.getFullYear().toString().slice(2); // Deux derniers chiffres de l'année
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Mois avec un zéro devant si nécessaire
-        const day = String(date.getDate()).padStart(2, '0'); // Jour avec un zéro devant si nécessaire
-        const hours = String(date.getHours()).padStart(2, '0'); // Heures avec un zéro devant si nécessaire
-        const minutes = String(date.getMinutes()).padStart(2, '0'); // Minutes avec un zéro devant si nécessaire
+        const year = date.getFullYear().toString().slice(2); 
+        const month = String(date.getMonth() + 1).padStart(2, '0'); 
+        const day = String(date.getDate()).padStart(2, '0'); 
+        const hours = String(date.getHours()).padStart(2, '0'); 
+        const minutes = String(date.getMinutes()).padStart(2, '0'); 
         return `${year}_${day}_${month}_${hours}_${minutes}`;
     }
 

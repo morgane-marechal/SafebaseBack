@@ -4,9 +4,12 @@ const fastify = require('fastify')({
   })
 
 fastify.register(apiRoutes)
+fastify.register(require('@fastify/cors'), { 
+  origin: true, 
+});
 
 
-fastify.listen({ port: 3000 }, function (err, address) {
+fastify.listen({ port: 3001 }, function (err, address) {
   if (err) {
     fastify.log.error(err)
     process.exit(1)

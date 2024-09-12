@@ -10,7 +10,7 @@ services:
     ports:
       - '5434:5432' # Le port interne 5432 est mappé au port externe 5434
 
-  postgres_database_prod:
+  postgres_database_dev:
     image: 'postgres'
     environment:
       POSTGRES_PASSWORD: pass
@@ -19,7 +19,7 @@ services:
     ports:
       - '5433:5432' # Le port interne 5432 est mappé au port externe 5433
 
-  mysql_database:
+  mysql_database_prod:
     image: 'mysql:8.0'
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -30,6 +30,8 @@ services:
       - '3307:3306'
 
   adminer:
+    environment:
+      - UPLOAD_LIMIT=100M
     image: adminer
     restart: always
     ports:

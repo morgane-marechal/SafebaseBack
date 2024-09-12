@@ -14,6 +14,7 @@ class Connect {
 
     //gestion connection
     async connect() {
+        console.log(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASSWORD, process.env.DB_NAME, process.env.DB_PORT);
         try {
             await this.client.connect();
             console.log('Connected to database');

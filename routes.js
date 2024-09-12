@@ -61,22 +61,40 @@ async function routes (fastify, options) {
     })
 
     //créer une nouvelle connection à une bdd
+    // fastify.post("/api/database", (request, reply) => {
+    //     //a changer quand front fait
+    //     const newDatabase = {
+    //         user: 'dbUser2',
+    //         password: 'dbPassword',
+    //         host: 'localhost',
+    //         port: 5432,
+    //         type: 'PostgreSQL',
+    //         name: 'my_database',
+    //         container_name: 'my_postgres_container2'
+    //       };
+    //     const databases = new DatabasesManagement();
+    //     databases.insertNewDatabase(newDatabase)
+    //     .then(result => console.log('Insertion réussie:', result))
+    //     .catch(error => console.error('Erreur:', error));
+    // })
+
     fastify.post("/api/database", (request, reply) => {
-        //a changer quand front fait
-        const newDatabase = {
-            user: 'dbUser2',
-            password: 'dbPassword',
-            host: 'localhost',
-            port: 5432,
-            type: 'PostgreSQL',
-            name: 'my_database',
-            container_name: 'my_postgres_container2'
-          };
-        const databases = new DatabasesManagement();
-        databases.insertNewDatabase(newDatabase)
-        .then(result => console.log('Insertion réussie:', result))
-        .catch(error => console.error('Erreur:', error));
-    })
+        const newDatabase = request.body; 
+            if (!newDatabase || !newDatabase.user || !newDatabase.password || !newDatabase.host) {
+            return reply.status(400).send({ error: "Données de base de données manquantes ou invalides" });
+        }
+            const databases = new DatabasesManagement();
+            databases.insertNewDatabase(newDatabase)
+            .then(result => {
+                console.log('Insertion réussie:', result);
+                reply.status(201).send({ message: 'Base de données ajoutée avec succès', result });
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'insertion:', error);
+                reply.status(500).send({ error: 'Erreur lors de l\'insertion de la base de données' });
+            });
+    });
+    
 
     //éditer connection base de donnée spécifique
     fastify.put("/api/database/:databaseId", (request, reply) => {
@@ -154,7 +172,7 @@ async function routes (fastify, options) {
        
        //récupérer les sauvegardes par database (mysql ou postgres)
 
-       fastify.get('/api/database/backup/:databaseId', async (request, reply) => {
+       fastify.get('/api/backup/:databaseId', async (request, reply) => {
         // const executor = new CommandExecutor();
         // executor.importPostGres() /*pour telecharger la base de données postgres*/
         //     .then(output => {

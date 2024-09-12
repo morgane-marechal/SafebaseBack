@@ -90,7 +90,7 @@ async function testInsertNewBackups() {
     }
 }
 
-// testInsertNewBackups();
+testInsertNewBackups();
 
 async function deleteBackup(){
     const backup = new BackupsManagement();
@@ -114,4 +114,16 @@ async function deleteDatabase(){
     }
 }
 
-deleteDatabase();
+// deleteDatabase();
+
+async function getBackups(){
+    const backups = new BackupsManagement();
+    try {
+        const result = await backups.findBackups();
+        console.log('liste backups', result);
+    } catch (error) {
+        console.error('pb', error);
+    }
+}
+
+// getBackups();

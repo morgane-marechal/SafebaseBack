@@ -10,7 +10,17 @@ class BackupsManagement extends Connect {
     async  findBackups(){
         try {
             await this.connect();
-            const res = await this.client.query(`SELECT * FROM backup_liste`);
+            const res = await this.client.query(`
+            SELECT 
+                backup_liste.*, 
+                database_liste.name AS database_name
+            FROM 
+                backup_liste
+            JOIN 
+                database_liste 
+            ON 
+                backup_liste.database_id = database_liste.id;
+            `);
             console.log(res.rows);
             await this.client.end();
             console.log(res.row);

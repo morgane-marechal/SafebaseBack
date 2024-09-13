@@ -7,6 +7,7 @@
 // const { exec } = require('child_process');
 const DatabasesManagement = require('./Classe/DatabasesManagement');
 const BackupsManagement = require('./Classe/BackupsManagement');
+const SystemeFunction = require('./Classe/SystemeFunction')
 
 const CommandExecutor = require('./Classe/SystemeFunction');
 
@@ -47,8 +48,7 @@ async function routes (fastify, options) {
 
     //récupérer une bdd spécifique
     fastify.get("/api/database/:databaseId", async (request, reply) => {
-        //changer l'id pour que ça soit une variable
-        const id = 1;
+        const id  = request.params.databaseId;
         const databases = new DatabasesManagement();
             try {
             const allData = await databases.findDatabaseById(id);
@@ -99,15 +99,15 @@ async function routes (fastify, options) {
     //éditer connection base de donnée spécifique
     fastify.put("/api/database/:databaseId", (request, reply) => {
 
-        const updateDatabase = {
-            user: 'dbUser2',
-            password: 'dbPassword',
-            host: 'localhost',
-            port: 5432,
-            type: 'PostgreSQL',
-            name: 'my_database',
-            container_name: 'my_postgres_container2'
-          };
+        // const updateDatabase = {
+        //     user: 'dbUser2',
+        //     password: 'dbPassword',
+        //     host: 'localhost',
+        //     port: 5432,
+        //     type: 'PostgreSQL',
+        //     name: 'my_database',
+        //     container_name: 'my_postgres_container2'
+        //   };
           const id = 1;
         const databases = new DatabasesManagement();
         databases.updateDatabase(id, updateDatabase)
@@ -116,21 +116,19 @@ async function routes (fastify, options) {
     })
 
     //supprimer une bdd specifique
-    fastify.delete("/api/database/:databaseId", (request, reply) => {
-        // var userId = request.params.userId
-        // User.findById(userId, (err, user) => {
-        //     if(!err) {
-        //         user.remove((er) => {
-        //             if(!er) {
-        //                 reply.send("USER DELETED")
-        //             } else {
-        //                 reply.send({ error: er })
-        //             }
-        //         })
-        //     } else {
-        //         reply.send({ error: err })
-        //     }
-        // })
+    fastify.delete("/api/database/delete/:databaseId", (request, reply) => {
+        const databaseId = request.params.backupId; 
+        const database = new DatabasesManagement();
+        database.deleteDatabase(databaseId)
+        .then(result => {
+            console.log('Connexion à la bdd supprimée:', result);
+            reply.send({ success: true, message: 'Connecion à la BDD supprimée', result });
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            reply.status(500).send({ success: false, error: 'Erreur lors de la suppression de la BDD' });
+        });
+    
     })
 
 
@@ -171,21 +169,11 @@ async function routes (fastify, options) {
       })
        
        //récupérer les sauvegardes par database (mysql ou postgres)
-
        fastify.get('/api/backup/:databaseId', async (request, reply) => {
-        // const executor = new CommandExecutor();
-        // executor.importPostGres() /*pour telecharger la base de données postgres*/
-        //     .then(output => {
-        //         console.log('Command Output:', output);
-        //         return { hello: 'postgres' }
-        //     })
-        //     .catch(error => {
-        //         console.error('Error:', error);
-        //     });
+
       })
 
        //créer une sauvegarde
-
        fastify.post("/api/backup", (request, reply) => {
         const newBackup = {
             type: 'Full',
@@ -193,17 +181,93 @@ async function routes (fastify, options) {
             saved_date: new Date(), // Utiliser la date actuelle
             database_id: 1 // Assurez-vous que cet ID existe dans votre table de bases de données
         };
-        const databases = new BackupsManagement();
-        databases.insertNewBackups(newBackup)
+        const backups = new BackupsManagement();
+        backups.insertNewBackups(newBackup)
         .then(result => console.log('Insertion réussie:', result))
         .catch(error => console.error('Erreur:', error));
     })
 
       // modifier une sauvegarde
 
-       //supprimer une sauvegarde
+     //supprimer un backup specifique
+     fastify.delete("/api/backup/delete/:backupId", (request, reply) => {
+        const backupId = request.params.backupId; 
+        const backups = new BackupsManagement();
+    
+        backups.deleteBackup(backupId)
+        .then(result => {
+            console.log('Sauvegarde supprimée:', result);
+            reply.send({ success: true, message: 'Sauvegarde supprimée', result });
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            reply.status(500).send({ success: false, error: 'Erreur lors de la suppression de la sauvegarde' });
+        });
+    });
+    
+    
+
 
        //------------------------API/actionSysteme
+       //dump de bdd
+       fastify.get('/api/systeme/dump/:databaseId', async (request, reply) => {
+        try {
+            const databaseId = request.params.databaseId;
+            console.log('Database ID:', databaseId);
+            const database = new DatabasesManagement();
+            const databaseInfo = await database.findDatabaseById(databaseId);
+            if(databaseInfo[0].type==="postgres"){
+                const dumpPg = new SystemeFunction()
+                const backups = new BackupsManagement();
+                try {
+                    const result = await dumpPg.importPostGres();
+                    const date = dumpPg.getFormattedTimestamp()      
+                    const newBackup = {
+                        type: 'postgres',
+                        path: `Sauvegardes/SauvegardesPosteGres/savebase_postgres_${date}.sql`,
+                        saved_date: new Date(), 
+                        database_id: databaseId
+                    };        
+                    console.log('nouveau dump de postgres', result);
+                    const result2 = await backups.insertNewBackups(newBackup);
+                } catch (error) {
+                    console.error('pb', error);
+                }
+            }else if(databaseInfo[0].type==="mysql"){
+                const dumpMysql = new SystemeFunction()
+                const backups = new BackupsManagement();
+                try {
+                    const result = await dumpMysql.importMySql();
+                    const date = dumpMysql.getFormattedTimestamp()      
+                    const newBackup = {
+                        type: 'mysql',
+                        path: `Sauvegardes/SauvegardesSQL/savebase_mysql_${date}.sql`,
+                        saved_date: new Date(), 
+                        database_id: databaseId
+                    };        
+                    console.log('nouveau dump de postgres', result);
+                    const result2 = await backups.insertNewBackups(newBackup);
+                } catch (error) {
+                    console.error('pb', error);
+                }
+
+            }
+                
+            // Vous pouvez ajouter ici la logique pour traiter les données avec databaseId
+    
+
+            reply.send({ success: true, message: 'Data fetched successfully' });
+        } catch (error) {
+            console.error('Error processing request:', error);
+            reply.status(500).send({ error: 'Internal Server Error' });
+        }
+    });
+
+
+       //restauration d'un bdd precise
+       fastify.get("/api/systeme/restauration/:databaseId",()=>{
+
+       });
 
 
   }

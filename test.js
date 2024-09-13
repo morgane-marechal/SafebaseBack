@@ -1,6 +1,7 @@
 const Connect = require('./Classe/Connect');
 const DatabasesManagement = require('./Classe/DatabasesManagement');
 const BackupsManagement = require('./Classe/BackupsManagement');
+const SystemeFunction = require('./Classe/SystemeFunction');
 
 // test-env.js
 console.log(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASSWORD, process.env.DB_NAME, process.env.DB_PORT);
@@ -77,7 +78,7 @@ function updateDatabase(){
 async function testInsertNewBackups() {
     const databases = new BackupsManagement();
     const newBackup = {
-        type: 'Full',
+        type: 'postgres',
         path: '/backups/full_backup_2024.sql',
         saved_date: new Date(), // Utiliser la date actuelle
         database_id: 1 // Assurez-vous que cet ID existe dans votre table de bases de données
@@ -90,7 +91,7 @@ async function testInsertNewBackups() {
     }
 }
 
-testInsertNewBackups();
+// testInsertNewBackups();
 
 async function deleteBackup(){
     const backup = new BackupsManagement();
@@ -127,3 +128,25 @@ async function getBackups(){
 }
 
 // getBackups();
+
+async function dumpPostgres(){
+    const dumpPg = new SystemeFunction()
+    const backups = new BackupsManagement();
+
+    try {
+        const result = await dumpPg.importPostGres();
+        const date = dumpPg.getFormattedTimestamp()
+
+        const newBackup = {
+            type: 'postgres',
+            path: `Sauvegardes/SauvegardesPosteGres/savebase_postgres_${date}.sql`,
+            saved_date: new Date(), 
+            database_id: 1 
+        };        console.log('nouveau dump de postgres', result);
+        const result2 = await backups.insertNewBackups(newBackup);
+    } catch (error) {
+        console.error('pb', error);
+    }
+}
+
+dumpPostgres()

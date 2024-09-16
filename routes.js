@@ -265,18 +265,18 @@ async function routes (fastify, options) {
 
 
        //restauration d'un bdd precise
-       fastify.get("/api/systeme/restauration/:databaseId",async (request, reply)=>{
+       fastify.get("/api/systeme/restauration/:backupId",async (request, reply)=>{
         const backupId = request.params.backupId; 
-        const backupType = new backupTypeManagement();
+        const backupType = new BackupsManagement();
         type = await backupType.getTypeById(backupId);
         console.log("type",type);
-        const backupPath = new backupTypeManagement();
-        type = await backupPath.getPathById(backupId);
-        console.log("path",path);
-        
-        if (type===postgres){
+        const backupPath = new BackupsManagement();
+        path = await backupPath.getPathById(backupId);
+
+        if (type==='postgres'){
             const system = new SystemeFunction();
-            system.restorePostgres(path)
+            console.log("path",path);
+            await system.restorePostgres(path)
         .then(result => {
             console.log('restauration de la base de donnée postgres:', result);
             reply.send({ success: true, message: 'Sauvegarde restaurée', result });

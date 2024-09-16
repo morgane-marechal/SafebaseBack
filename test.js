@@ -149,4 +149,41 @@ async function dumpPostgres(){
     }
 }
 
-dumpPostgres()
+// dumpPostgres()
+
+
+async function getBackupById(id){
+    const backups = new BackupsManagement();
+    try {
+        const result = await backups.findBackups();
+        console.log('liste backups', result);
+    } catch (error) {
+        console.error('pb', error);
+    }
+}
+
+// getPathById(2);
+
+async function getPathById(){
+    const backups = new BackupsManagement();
+    try {
+        const result = await backups.getPathById(2);
+        console.log('liste backups', result);
+    } catch (error) {
+        console.error('pb', error);
+    }
+}
+
+// getPathById();
+
+async function getTypeById(){
+    const backups = new BackupsManagement();
+    try {
+        const result = await backups.getTypeById(18);
+        console.log('liste backups', result);
+    } catch (error) {
+        console.error('pb', error);
+    }
+}
+
+getTypeById()

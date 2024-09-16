@@ -190,11 +190,15 @@ async function routes (fastify, options) {
       // modifier une sauvegarde
 
      //supprimer un backup specifique
-     fastify.delete("/api/backup/delete/:backupId", (request, reply) => {
+     fastify.delete("/api/backup/delete/:backupId", async(request, reply) => {
         const backupId = request.params.backupId; 
         const backups = new BackupsManagement();
-    
-        backups.deleteBackup(backupId)
+        path = await backups.getPathById(backupId);
+        console.log("chement du backup",path);
+        const system = new SystemeFunction();
+        system.deleteFile(path);
+        const backup = new BackupsManagement();
+        await backup.deleteBackup(backupId)
         .then(result => {
             console.log('Sauvegarde supprimée:', result);
             reply.send({ success: true, message: 'Sauvegarde supprimée', result });
@@ -252,11 +256,7 @@ async function routes (fastify, options) {
                 }
 
             }
-                
-            // Vous pouvez ajouter ici la logique pour traiter les données avec databaseId
-    
-
-            reply.send({ success: true, message: 'Data fetched successfully' });
+            reply.send({ success: true, message: 'Le backup a été enregistré' });
         } catch (error) {
             console.error('Error processing request:', error);
             reply.status(500).send({ error: 'Internal Server Error' });
@@ -265,9 +265,30 @@ async function routes (fastify, options) {
 
 
        //restauration d'un bdd precise
-       fastify.get("/api/systeme/restauration/:databaseId",()=>{
+       fastify.get("/api/systeme/restauration/:databaseId",async (request, reply)=>{
+        const backupId = request.params.backupId; 
+        const backupType = new backupTypeManagement();
+        type = await backupType.getTypeById(backupId);
+        console.log("type",type);
+        const backupPath = new backupTypeManagement();
+        type = await backupPath.getPathById(backupId);
+        console.log("path",path);
+        
+        if (type===postgres){
+            const system = new SystemeFunction();
+            system.restorePostgres(path)
+        .then(result => {
+            console.log('restauration de la base de donnée postgres:', result);
+            reply.send({ success: true, message: 'Sauvegarde restaurée', result });
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            reply.status(500).send({ success: false, error: 'Erreur lors de la restauration de la sauvegarde' });
+        }
+        );
 
-       });
+       }
+    });
 
 
   }

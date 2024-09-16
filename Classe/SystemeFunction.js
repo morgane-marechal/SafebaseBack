@@ -57,6 +57,35 @@ class CommandExecutor {
             console.error(`Backup failed: ${error}`);
         }
     }
+
+    async deleteFile(path){
+        const command = `rm ${path}`;
+        try {
+            const output = await this.runCommand(command);
+            console.log(`Fichier supprimé avec succès: ${output}`);
+        } catch (error) {
+            console.error(`Echec de la suppression: ${error}`);
+        }
+    }
+
+
+    async restorePostgres(path){
+        const CONTAINER_NAME = "safebaseback-postgres_database_dev-1";
+        const PATH_FILE_NAME = path
+        const command = `docker exec -i ${CONTAINER_NAME} psql -U safebase -d safebase < ${PATH_FILE_NAME}
+        "`;
+        try {
+            const output = await this.runCommand(command);
+            console.log(`Restore Backup successful: ${output}`);
+        } catch (error) {
+            console.error(`Backup failed: ${error}`);
+        }
+
+    }
+
+    async restoreMysql(){
+
+    }
 }
 
 module.exports = CommandExecutor;

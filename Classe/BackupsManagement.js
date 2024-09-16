@@ -33,7 +33,7 @@ class BackupsManagement extends Connect {
         }
     }
 
-    async  findDatabaseById(id){
+    async  findBackupById(id){
         try {
             await this.connect();
             const res = await this.client.query(`SELECT * FROM backup_liste where id = '${id}'`);
@@ -47,6 +47,46 @@ class BackupsManagement extends Connect {
         }finally {
             await this.disconnect(); 
         }
+    }
+
+    async getPathById(id){
+        try {
+            await this.connect();
+            const res = await this.client.query(`SELECT * FROM backup_liste where id = '${id}'`);
+            if (res.rows.length > 0) {
+                const path = res.rows[0].path;
+                console.log(path); 
+                return path;
+            } else {
+                console.log('No record found with the provided ID.');
+                return null; 
+            }
+        } catch (error) {
+            console.error('Error fetching data from database:', error);
+            throw error; 
+        }finally {
+            await this.disconnect(); 
+        }     
+    }
+
+    async getTypeById(id){
+        try {
+            await this.connect();
+            const res = await this.client.query(`SELECT * FROM backup_liste where id = '${id}'`);
+            if (res.rows.length > 0) {
+                const type = res.rows[0].type;
+                console.log(type); 
+                return type;
+            } else {
+                console.log('No record found with the provided ID.');
+                return null; 
+            }
+        } catch (error) {
+            console.error('Error fetching data from database:', error);
+            throw error; 
+        }finally {
+            await this.disconnect(); 
+        }     
     }
 
     async  insertNewBackups(newBackup) {

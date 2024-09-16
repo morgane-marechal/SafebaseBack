@@ -1,6 +1,10 @@
 pour restaurer la base de l'appli via ligne de commande :
 docker exec -i safebaseback-postgres_database_version-1 psql -U safebase -d safebase < safebase_save_24_04_09_15_35.sql
 
+pour supprimer
+docker exec safebaseback-postgres_database_version-1 rm /path/to/safebase_save_24_04_09_15_35.sql
+
+
 
 pour faire le dump
 docker exec -t safebaseback-postgres_database_version-1 pg_dump --clean -U safebase safebase > "/home/morgane/projets/SafebaseBack/SaveListeVersions/safebase_save_2.sql"

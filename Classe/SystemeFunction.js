@@ -35,7 +35,7 @@ class CommandExecutor {
     async importPostGres() {
         const CONTAINER_NAME = "safebaseback-postgres_database_dev-1";
         const TIMESTAMP = this.getFormattedTimestamp();
-        const command = `docker exec -t ${CONTAINER_NAME} pg_dump --clean -U dev dev > "/home/morgane/projets/SafebaseBack/Sauvegardes/SauvegardesPosteGres/savebase_postgres_${TIMESTAMP}.sql"`;
+        const command = `docker exec -t ${CONTAINER_NAME} pg_dump --clean --if-exists -U dev dev > "/home/morgane/projets/SafebaseBack/Sauvegardes/SauvegardesPosteGres/savebase_postgres_${TIMESTAMP}.sql"`;
         try {
             const output = await this.runCommand(command);
             console.log(`Backup successful: ${output}`);
@@ -56,6 +56,34 @@ class CommandExecutor {
         } catch (error) {
             console.error(`Backup failed: ${error}`);
         }
+    }
+
+    async deleteFile(path){
+        const command = `rm ${path}`;
+        try {
+            const output = await this.runCommand(command);
+            console.log(`Fichier supprimé avec succès: ${output}`);
+        } catch (error) {
+            console.error(`Echec de la suppression: ${error}`);
+        }
+    }
+
+
+    async restorePostgres(path){
+        const CONTAINER_NAME = "safebaseback-postgres_database_dev-1";
+        const PATH_FILE_NAME = path
+        const command = `docker exec -i ${CONTAINER_NAME} psql -U dev -d dev < ${PATH_FILE_NAME}`;
+        try {
+            const output = await this.runCommand(command);
+            console.log(`Restore Backup successful: ${output}`);
+        } catch (error) {
+            console.error(`Backup failed: ${error}`);
+        }
+
+    }
+
+    async restoreMysql(){
+
     }
 }
 

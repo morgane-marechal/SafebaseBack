@@ -125,7 +125,7 @@ ALTER TABLE ONLY public.database_liste ALTER COLUMN id SET DEFAULT nextval('publ
 --
 
 COPY public.backup_liste (id, type, path, saved_date, database_id) FROM stdin;
-1	postgres	/home/morgane/projets/SafebaseBack/Sauvegardes/SauvegardesPosteGres/savebase_postgres_2024-09-04_13-10-44.sql	\N	1
+1	postgres	/Sauvegardes/SauvegardesPosteGres/savebase_postgres_2024-09-04_13-10-44.sql	\N	1
 \.
 
 

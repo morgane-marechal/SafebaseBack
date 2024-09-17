@@ -98,17 +98,7 @@ async function routes (fastify, options) {
 
     //éditer connection base de donnée spécifique
     fastify.put("/api/database/:databaseId", (request, reply) => {
-
-        // const updateDatabase = {
-        //     user: 'dbUser2',
-        //     password: 'dbPassword',
-        //     host: 'localhost',
-        //     port: 5432,
-        //     type: 'PostgreSQL',
-        //     name: 'my_database',
-        //     container_name: 'my_postgres_container2'
-        //   };
-          const id = 1;
+        const id = 1;
         const databases = new DatabasesManagement();
         databases.updateDatabase(id, updateDatabase)
         .then(result => console.log('Insertion réussie:', result))
@@ -127,11 +117,8 @@ async function routes (fastify, options) {
         .catch(error => {
             console.error('Erreur:', error);
             reply.status(500).send({ success: false, error: 'Erreur lors de la suppression de la BDD' });
-        });
-    
+        });  
     })
-
-
 
 //
 //----------------------------pour tester le backup
@@ -149,9 +136,6 @@ async function routes (fastify, options) {
             });
       })
 
-
-
-
             //------------------------API/backup
 
        //récupérer toutes les sauvegardes
@@ -166,8 +150,7 @@ async function routes (fastify, options) {
                 console.error('Error fetching databases:', err);
                 reply.status(500).send({ error: err.message });
             }
-      })
-       
+      })    
        //récupérer les sauvegardes par database (mysql ou postgres)
        fastify.get('/api/backup/:databaseId', async (request, reply) => {
 
@@ -254,7 +237,6 @@ async function routes (fastify, options) {
                 } catch (error) {
                     console.error('pb', error);
                 }
-
             }
             reply.send({ success: true, message: 'Le backup a été enregistré' });
         } catch (error) {
@@ -277,16 +259,28 @@ async function routes (fastify, options) {
             const system = new SystemeFunction();
             console.log("path",path);
             await system.restorePostgres(path)
-        .then(result => {
-            console.log('restauration de la base de donnée postgres:', result);
+            .then(result => {
+                console.log('restauration de la base de donnée postgres:', result);
+                reply.send({ success: true, message: 'Sauvegarde restaurée', result });
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                reply.status(500).send({ success: false, error: 'Erreur lors de la restauration de la sauvegarde' });
+            }
+        );
+       }else if(type==='mysql'){
+        console.log('kikikikikkkkkkkkkkkkkkkkkkkkkkkkkkkkkk');
+        const system = new SystemeFunction();
+        console.log("path",path);
+        await system.restoreSql(path)
+        .then(result => {    
+            console.log('restauration de la base de donnée mysql:', result);
             reply.send({ success: true, message: 'Sauvegarde restaurée', result });
         })
         .catch(error => {
             console.error('Erreur:', error);
             reply.status(500).send({ success: false, error: 'Erreur lors de la restauration de la sauvegarde' });
-        }
-        );
-
+        })
        }
     });
 

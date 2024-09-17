@@ -7,4 +7,4 @@ docker exec safebaseback-postgres_database_version-1 rm /path/to/safebase_save_2
 
 
 pour faire le dump
-docker exec -t safebaseback-postgres_database_version-1 pg_dump --clean -U safebase safebase > "/home/morgane/projets/SafebaseBack/SaveListeVersions/safebase_save_2.sql"
+docker exec -t safebaseback-postgres_database_version-1 pg_dump --clean --if-exists -U safebase safebase > "/home/morgane/projets/SafebaseBack/SaveListeVersions/safebase_save_3.sql"

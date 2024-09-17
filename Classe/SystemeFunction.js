@@ -48,7 +48,7 @@ class CommandExecutor {
     async importMySql() {
         const CONTAINER_NAME = "safebaseback-mysql_database_prod-1";
         const TIMESTAMP = this.getFormattedTimestamp();
-        const command = `docker  exec -i ${CONTAINER_NAME} mysqldump --clean -u prod -p'pass' prod > "/home/morgane/projets/SafebaseBack/Sauvegardes/SauvegardesSQL/savebase_mysql_${TIMESTAMP}.sql"`;
+        const command = `docker  exec -i ${CONTAINER_NAME} mysqldump -u prod -p'pass' prod > "/home/morgane/projets/SafebaseBack/Sauvegardes/SauvegardesSQL/savebase_mysql_${TIMESTAMP}.sql"`;
         // const command = `docker exec -t ${CONTAINER_NAME} pg_dump --clean -U dev dev > "/home/morgane/projets/SafebaseBack/Sauvegardes/SauvegardesPosteGres/savebase_postgres_${TIMESTAMP}.sql"`;
         try {
             const output = await this.runCommand(command);
@@ -79,7 +79,18 @@ class CommandExecutor {
         } catch (error) {
             console.error(`Backup failed: ${error}`);
         }
+    }
 
+    async restoreSql(path){
+        const CONTAINER_NAME = "safebaseback-mysql_database_prod-1";
+        const PATH_FILE_NAME = path;
+        const command = `docker exec -i ${CONTAINER_NAME} mysql -u prod -ppass prod < ${PATH_FILE_NAME}`;
+        try {
+            const output = await this.runCommand(command);
+            console.log(`Restore Backup successful: ${output}`);
+        } catch (error) {
+            console.error(`Backup failed: ${error}`);
+        }
     }
 
     async restoreMysql(){

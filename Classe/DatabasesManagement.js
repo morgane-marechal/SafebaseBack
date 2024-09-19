@@ -102,6 +102,27 @@ class DatabasesManagement extends Connect {
         }
     }
 
+
+    async getTypeById(id){
+        try {
+            await this.connect();
+            const res = await this.client.query(`SELECT * FROM database_liste where id = '${id}'`);
+            if (res.rows.length > 0) {
+                const type = res.rows[0].type;
+                console.log(type); 
+                return type;
+            } else {
+                console.log('No record found with the provided ID.');
+                return null; 
+            }
+        } catch (error) {
+            console.error('Error fetching data from database:', error);
+            throw error; 
+        }finally {
+            await this.disconnect(); 
+        }     
+    }
+
 }
 
 module.exports = DatabasesManagement;

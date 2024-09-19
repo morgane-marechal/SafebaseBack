@@ -8,8 +8,10 @@
 const DatabasesManagement = require('./Classe/DatabasesManagement');
 const BackupsManagement = require('./Classe/BackupsManagement');
 const SystemeFunction = require('./Classe/SystemeFunction')
-
 const CommandExecutor = require('./Classe/SystemeFunction');
+const { CronJob } = require('cron');
+const { exec } = require('child_process');
+
 
 async function routes (fastify, options) {
 
@@ -22,10 +24,6 @@ async function routes (fastify, options) {
           reply.send({ bdd:'liste des bases de données disponibles' })
       
     })
-
-    // fastify.get('/api/test', async (request, reply) => {
-    //   return { hello: 'world en capsule pour le test' }
-    // })
 
 
 
@@ -60,23 +58,6 @@ async function routes (fastify, options) {
         }
     })
 
-    //créer une nouvelle connection à une bdd
-    // fastify.post("/api/database", (request, reply) => {
-    //     //a changer quand front fait
-    //     const newDatabase = {
-    //         user: 'dbUser2',
-    //         password: 'dbPassword',
-    //         host: 'localhost',
-    //         port: 5432,
-    //         type: 'PostgreSQL',
-    //         name: 'my_database',
-    //         container_name: 'my_postgres_container2'
-    //       };
-    //     const databases = new DatabasesManagement();
-    //     databases.insertNewDatabase(newDatabase)
-    //     .then(result => console.log('Insertion réussie:', result))
-    //     .catch(error => console.error('Erreur:', error));
-    // })
 
     fastify.post("/api/database", (request, reply) => {
         const newDatabase = request.body; 
@@ -136,7 +117,7 @@ async function routes (fastify, options) {
             });
       })
 
-            //------------------------API/backup
+        //------------------------API/backup
 
        //récupérer toutes les sauvegardes
 
@@ -191,8 +172,6 @@ async function routes (fastify, options) {
             reply.status(500).send({ success: false, error: 'Erreur lors de la suppression de la sauvegarde' });
         });
     });
-    
-    
 
 
        //------------------------API/actionSysteme
@@ -284,6 +263,53 @@ async function routes (fastify, options) {
        }
     });
 
+    //pour les crons
+
+    fastify.post("/api/autosave", async (request, reply) => {
+        const newCron = request.body; 
+        console.log(newCron);
+        const cron = newCron.cron;
+        const databaseId = newCron.databaseId;
+        const databases = new DatabasesManagement();
+
+        /*le probleme viens de type qui renvoie toujours postgres*/ 
+        const type = await databases.getTypeById(databaseId);
+        let script ='';
+        console.log("tyyyypppppre",type)
+        // script = "node cronMySql.js"
+        if(type==='postgres'){
+            script = "node cronPostgres.js"
+        }else if(type === 'mysql'){
+            script = "node cronMySql.js"
+        }
+        // const command = `(crontab -l ; echo "${cron} ${script}") | crontab -`
+        if (!script) {
+            console.error("Aucun script à exécuter");
+        } else {
+        const job = new CronJob(
+            cron,
+            function () {
+                console.log('Tâche cron démarrée, exécution du script:', script);
+                
+                exec(script, (error, stdout, stderr) => {
+                    if (error) {
+                        console.error(`Erreur d'exécution du script: ${error.message}`);
+                        return;
+                    }
+                    if (stderr) {
+                        console.error(`Erreur: ${stderr}`);
+                        return;
+                    }
+                    console.log(`Sortie du script: ${stdout}`);
+                });
+            },
+            null, 
+            true, 
+            'America/Los_Angeles' // Timezone
+        );
+        }
+        reply.send({ success: true, message: 'Tâche cron ajoutée avec succès.' });
+        });
 
   }
   

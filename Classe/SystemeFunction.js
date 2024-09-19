@@ -93,9 +93,7 @@ class CommandExecutor {
         }
     }
 
-    async restoreMysql(){
 
-    }
 }
 
 module.exports = CommandExecutor;

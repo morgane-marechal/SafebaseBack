@@ -34,7 +34,15 @@ class BackupsManagement extends Connect {
     }
 
     async  findBackupById(id){
-        try {
+        try {const job = new CronJob(
+            '* * * * * *', // cronTime
+            function () {
+                console.log('You will see this message every second');
+            }, // onTick
+            null, // onComplete
+            true, // start
+            'America/Los_Angeles' // timeZone
+        );
             await this.connect();
             const res = await this.client.query(`SELECT * FROM backup_liste where id = '${id}'`);
             console.log(res.rows);

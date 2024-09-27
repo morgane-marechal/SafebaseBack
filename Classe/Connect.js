@@ -4,11 +4,19 @@ require('dotenv').config();
 
 class Connect {
     constructor() {
+        // this.client = new Client({
+        //     host: process.env.DB_HOST,
+        //     user: process.env.DB_USER,
+        //     password: process.env.DB_PASSWORD,
+        //     port: process.env.DB_PORT,
+        // });
+
         this.client = new Client({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            port: process.env.DB_PORT,
+            host: 'postgres_database_version',
+            port: 5432,
+            user: 'safebase',
+            password: 'pass',
+            database: 'safebase',
         });
     }
 

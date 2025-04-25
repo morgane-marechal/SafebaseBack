@@ -46,6 +46,10 @@ async function routes (fastify, options) {
         }
     });
 
+
+
+    
+
     //récupérer une bdd spécifique
     fastify.get("/api/database/:databaseId", async (request, reply) => {
         const id  = request.params.databaseId;
@@ -78,7 +82,37 @@ async function routes (fastify, options) {
     //     .catch(error => console.error('Erreur:', error));
     // })
 
-    fastify.post("/api/database", (request, reply) => {
+    // fastify.post("/api/database", (request, reply) => {
+    //     const newDatabase = request.body; 
+    //         if (!newDatabase || !newDatabase.user || !newDatabase.password || !newDatabase.host) {
+    //         return reply.status(400).send({ error: "Données de base de données manquantes ou invalides" });
+    //     }
+    //         const databases = new DatabasesManagement();
+    //         databases.insertNewDatabase(newDatabase)
+    //         .then(result => {
+    //             console.log('Insertion réussie:', result);
+    //             reply.status(201).send({ message: 'Base de données ajoutée avec succès', result });
+    //         })
+    //         .catch(error => {
+    //             console.error('Erreur lors de l\'insertion:', error);
+    //             reply.status(500).send({ error: 'Erreur lors de l\'insertion de la base de données' });
+    //         });
+    // });
+
+
+    fastify.post('/api/database', {
+        schema: {
+          body: {
+            type: 'object',
+            required: ['user', 'password', 'host'],
+            properties: {
+              user: { type: 'string', minLength: 3 },
+              password: { type: 'string', minLength: 8 },
+              host: { type: 'string', format: 'hostname' }
+            }
+          }
+        }
+      }, (request, reply) => {
         const newDatabase = request.body; 
             if (!newDatabase || !newDatabase.user || !newDatabase.password || !newDatabase.host) {
             return reply.status(400).send({ error: "Données de base de données manquantes ou invalides" });
@@ -92,8 +126,7 @@ async function routes (fastify, options) {
             .catch(error => {
                 console.error('Erreur lors de l\'insertion:', error);
                 reply.status(500).send({ error: 'Erreur lors de l\'insertion de la base de données' });
-            });
-    });
+            });      });
     
 
     //éditer connection base de donnée spécifique
